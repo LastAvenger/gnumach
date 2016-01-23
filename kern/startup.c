@@ -79,6 +79,7 @@ boolean_t reboot_on_panic = TRUE;
 /* XX */
 extern vm_offset_t phys_first_addr, phys_last_addr;
 extern char *kernel_cmdline;
+extern void	intr_thread();
 
 /*
  *	Running in virtual memory, on the interrupt stack.
@@ -221,6 +222,9 @@ void start_kernel_threads(void)
 	(void) kernel_thread(kernel_task, reaper_thread, (char *) 0);
 	(void) kernel_thread(kernel_task, swapin_thread, (char *) 0);
 	(void) kernel_thread(kernel_task, sched_thread, (char *) 0);
+#ifndef MACH_XEN
+	(void) kernel_thread(kernel_task, intr_thread, (char *)0);
+#endif	/* MACH_XEN */
 
 #if	NCPUS > 1
 	/*
